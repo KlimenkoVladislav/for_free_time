@@ -1,8 +1,13 @@
 #include <iostream>
 
+void kramer();
 float determinat(int N, int **matrica, int flag);
 
 int main(){
+    kramer();
+}
+
+void kramer(){
     int n; 
     do{
         std::cout << "Введите размер матрицы NxN: ";
