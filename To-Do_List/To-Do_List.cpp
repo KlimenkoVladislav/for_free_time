@@ -6,16 +6,20 @@
 typedef std::string Str;
 
 struct task{
+    int task_num;
+
     Str task_text;
     int task_dif;
     int task_end_day;
     int task_end_month;
     int task_end_year;
     int important;
+
     task *next;
 };
 
-void add(task *last, int day_today, int month_today, int year_today);
+void add(task *last, int day_today, int month_today, int year_today, int kol_task);
+task *delete_task(task *begin, int kol_task);
 void show_all(task *prohodka);
 
 int main(){
@@ -58,7 +62,14 @@ int main(){
             std::cin >> num;
         }while (num<0 or num>5);
 
-        if (num == 0){break;}
+        if (num == 0){
+            while (begin){
+                task *mem_del = begin->next;
+                delete[] begin;
+                begin = mem_del;
+            }
+            break;
+        }
         else if (num == 1){
             if (kol_task == 0){
                 begin = new task;
@@ -69,17 +80,22 @@ int main(){
                 last = last->next;
             }
             kol_task++;
-            add(last, day_today, month_today, year_today);
+            add(last, day_today, month_today, year_today, kol_task);
+        }
+        else if (num == 2){
+            kol_task--;
+            begin = delete_task(begin, kol_task);
         }
         else if (num == 3){
-            kol_task++;
             show_all(begin);
         }
     }
 }
 
-void add(task *last, int day_today, int month_today, int year_today){
+void add(task *last, int day_today, int month_today, int year_today, int kol_task){
     last->next = nullptr;
+
+    last->task_num = kol_task;
 
     std::cout << "\nВведите задачу: \n";
     std::cin.ignore();
@@ -117,22 +133,73 @@ void add(task *last, int day_today, int month_today, int year_today){
         }
     }
 
-    int from_today_to_end = last->task_end_year*365 + last->task_end_month*31 + last->task_end_day - year_today*365 - month_today*31 - day_today;
-    if (from_today_to_end>30){last->important = 0 + last->task_dif;}
-    else if (from_today_to_end>20 and from_today_to_end<=29){last->important = 1 + last->task_dif;}
-    else if (from_today_to_end>15 and from_today_to_end<=19){last->important = 2 + last->task_dif;}
-    else if (from_today_to_end>7 and from_today_to_end<=14){last->important = 3 + last->task_dif;}
-    else if (from_today_to_end>2 and from_today_to_end<=6){last->important = 4 + last->task_dif;}
-    else if (from_today_to_end<=2){last->important = 5 + last->task_dif;}
+    float from_today_to_end = last->task_end_year*365 + last->task_end_month*30.5 + last->task_end_day - year_today*365 - month_today*30.5 - day_today;
+    if (from_today_to_end>30.0){last->important = 0 + last->task_dif;}
+    else if (from_today_to_end>20.0 and from_today_to_end<=30.0){last->important = 1 + last->task_dif;}
+    else if (from_today_to_end>15.0 and from_today_to_end<=20.0){last->important = 2 + last->task_dif;}
+    else if (from_today_to_end>7.0 and from_today_to_end<=15.0){last->important = 3 + last->task_dif;}
+    else if (from_today_to_end>2.0 and from_today_to_end<=7.0){last->important = 4 + last->task_dif;}
+    else if (from_today_to_end<=2.0){last->important = 5 + last->task_dif;}
+}
+
+task *delete_task(task *begin, int kol_task){
+    if (begin == nullptr){
+        std::cout << "Удалять нечего" << "\n";
+        return nullptr;
+    }
+
+    int num_delete_task;
+    do{
+        std::cout << "Введите номер задания, которы вы хотите удалить: ";
+        std::cin >> num_delete_task;
+    }while(num_delete_task<0 or num_delete_task>kol_task+1);
+    
+    task *you_here = begin;
+    bool change_all_next_num = false;
+    while (you_here->next == nullptr or kol_task == 0){
+        if (change_all_next_num == true){
+            (you_here->task_num)--;
+        }
+        if (begin->task_num == num_delete_task){
+            change_all_next_num = true;
+            if (begin->next == nullptr){
+                break;
+            }
+            begin = begin->next;
+            you_here->next = nullptr;
+            you_here = begin;
+            continue;
+        }
+        else if ((change_all_next_num == false) and (you_here->next!=nullptr) and (you_here->next->task_num == num_delete_task)){
+            if (you_here->next->next == nullptr){
+                you_here->next = nullptr;
+            }
+            else{
+                you_here->next = you_here->next->next;
+                you_here->next->next = nullptr;
+            }
+            change_all_next_num = true;
+        }
+        you_here = you_here->next;
+    }
+
+    return begin;
 }
 
 void show_all(task *prohodka){
+    if (prohodka == nullptr){
+        std::cout << "Задач нет\n";
+        return;
+    }
+    std::cout << "________________________________________\n";
     while (prohodka){
-        std::cout << "\nЗадание: " << prohodka->task_text << "\n"
+        std::cout << "\nНомер задания: " << prohodka->task_num << "\n" 
+                  << "Задание: " << prohodka->task_text << "\n"
                   << "Выполнить до: " << prohodka->task_end_day << "." << prohodka->task_end_month << "." << prohodka->task_end_year << "\n"
                   << "Сложность задания (от 1 до 5): " << prohodka->task_dif << "\n"
                   << "Срочность (в зависимости от сложности): " << prohodka->important << "\n";
 
         prohodka = prohodka->next;
     }
+    std::cout << "________________________________________\n";
 }
