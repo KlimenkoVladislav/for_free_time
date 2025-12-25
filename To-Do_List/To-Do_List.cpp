@@ -21,6 +21,8 @@ struct task{
 void add(task *last, int day_today, int month_today, int year_today, int kol_task);
 task *delete_task(task *begin, int kol_task);
 void show_all(task *prohodka);
+void find_important(task *prohodka);
+void delete_all(task *begin);
 
 int main(){
     task *begin = nullptr;
@@ -100,6 +102,17 @@ int main(){
         }
         else if (num == 3){
             show_all(begin);
+        }
+        else if (num == 4){
+            find_important(begin);
+        }
+        else if (num == 5){
+            if (kol_task>0){
+                kol_task = 0;
+                delete_all(begin);
+                begin = nullptr;
+                last = begin;
+            }
         }
         else if (num == 6){
             std::cout << kol_task << "\n";
@@ -226,4 +239,33 @@ void show_all(task *prohodka){
         prohodka = prohodka->next;
     }
     std::cout << "________________________________________\n";
+}
+
+void find_important(task *prohodka){
+    std::cout << "\n_____________________________________________";
+    int kol = 0;
+    while (prohodka){
+        if (prohodka->important >= 5){
+            kol++;
+            std::cout << "\nНомер задания: " << prohodka->task_num << "\n" 
+                  << "Задание: " << prohodka->task_text << "\n"
+                  << "Выполнить до: " << prohodka->task_end_day << "." << prohodka->task_end_month << "." << prohodka->task_end_year << "\n"
+                  << "Сложность задания (от 1 до 5): " << prohodka->task_dif << "\n"
+                  << "Срочность (в зависимости от сложности): " << prohodka->important << "\n";
+        }
+        prohodka = prohodka->next;
+    }
+    if (kol == 0){
+        std::cout << "Срочных задач нет\n";
+    }
+    std::cout << "_____________________________________________\n";
+}
+
+void delete_all(task *begin){
+    task *na_raz;
+    while (begin){
+        na_raz = begin->next;
+        delete begin;
+        begin = na_raz;
+    }
 }
