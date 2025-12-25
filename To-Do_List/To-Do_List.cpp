@@ -83,11 +83,26 @@ int main(){
             add(last, day_today, month_today, year_today, kol_task);
         }
         else if (num == 2){
-            kol_task--;
-            begin = delete_task(begin, kol_task);
+            if (kol_task == 0){
+                std::cout << "Удалять нечего" << "\n";
+                continue;
+            }
+            else{
+                kol_task--;
+                begin = delete_task(begin, kol_task);
+                last = begin;
+                if (last!=nullptr){
+                    while (last->next){
+                        last = last->next;
+                    }
+                }
+            }
         }
         else if (num == 3){
             show_all(begin);
+        }
+        else if (num == 6){
+            std::cout << kol_task << "\n";
         }
     }
 }
@@ -143,11 +158,6 @@ void add(task *last, int day_today, int month_today, int year_today, int kol_tas
 }
 
 task *delete_task(task *begin, int kol_task){
-    if (begin == nullptr){
-        std::cout << "Удалять нечего" << "\n";
-        return nullptr;
-    }
-
     int num_delete_task;
     do{
         std::cout << "Введите номер задания, которы вы хотите удалить: ";
@@ -156,31 +166,45 @@ task *delete_task(task *begin, int kol_task){
     
     task *you_here = begin;
     bool change_all_next_num = false;
-    while (you_here->next == nullptr or kol_task == 0){
-        if (change_all_next_num == true){
-            (you_here->task_num)--;
+
+    if (begin->task_num == num_delete_task){ //если удаляем начальный
+        change_all_next_num = true;
+        if (begin->next == nullptr){    //если только одно звено
+            delete begin;
+            return nullptr;
         }
-        if (begin->task_num == num_delete_task){
-            change_all_next_num = true;
-            if (begin->next == nullptr){
+        else{   //если звеньев несколько
+            begin = begin->next;
+            delete you_here;
+            you_here = begin;
+            if (you_here->next == nullptr){
+                you_here->task_num--;
+                return begin;
+            }
+        }
+    }
+    while (you_here->next){
+        if (change_all_next_num == true){
+            you_here->task_num--;
+        }
+        if ((change_all_next_num == false) and (you_here->next!=nullptr) and (you_here->next->task_num == num_delete_task)){ //если удаляем следующий
+            if (you_here->next->next == nullptr){   //если слудующий последний
+                delete you_here->next;
+                you_here->next = nullptr;
                 break;
             }
-            begin = begin->next;
-            you_here->next = nullptr;
-            you_here = begin;
-            continue;
-        }
-        else if ((change_all_next_num == false) and (you_here->next!=nullptr) and (you_here->next->task_num == num_delete_task)){
-            if (you_here->next->next == nullptr){
-                you_here->next = nullptr;
-            }
             else{
-                you_here->next = you_here->next->next;
+                task *na_raz = you_here->next->next;
                 you_here->next->next = nullptr;
+                delete you_here->next;
+                you_here->next = na_raz;
             }
             change_all_next_num = true;
         }
         you_here = you_here->next;
+        if (you_here->next == nullptr){
+            you_here->task_num--;
+        }
     }
 
     return begin;
@@ -191,7 +215,7 @@ void show_all(task *prohodka){
         std::cout << "Задач нет\n";
         return;
     }
-    std::cout << "________________________________________\n";
+    std::cout << "\n________________________________________\n";
     while (prohodka){
         std::cout << "\nНомер задания: " << prohodka->task_num << "\n" 
                   << "Задание: " << prohodka->task_text << "\n"
