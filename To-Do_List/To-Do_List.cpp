@@ -176,48 +176,33 @@ task *delete_task(task *begin, int kol_task){
         std::cout << "Введите номер задания, которы вы хотите удалить: ";
         std::cin >> num_delete_task;
     }while(num_delete_task<0 or num_delete_task>kol_task+1);
-    
+
     task *you_here = begin;
+    task *last = nullptr;
     bool change_all_next_num = false;
 
-    if (begin->task_num == num_delete_task){ //если удаляем начальный
-        change_all_next_num = true;
-        if (begin->next == nullptr){    //если только одно звено
-            delete begin;
-            return nullptr;
-        }
-        else{   //если звеньев несколько
-            begin = begin->next;
-            delete you_here;
-            you_here = begin;
-            if (you_here->next == nullptr){
-                you_here->task_num--;
-                return begin;
-            }
-        }
-    }
-    while (you_here->next){
-        if (change_all_next_num == true){
+    while (you_here){
+        if (change_all_next_num){
             you_here->task_num--;
         }
-        if ((change_all_next_num == false) and (you_here->next!=nullptr) and (you_here->next->task_num == num_delete_task)){ //если удаляем следующий
-            if (you_here->next->next == nullptr){   //если слудующий последний
-                delete you_here->next;
-                you_here->next = nullptr;
-                break;
+        else if(you_here->task_num == num_delete_task){
+            change_all_next_num = true;
+            if (last){
+                you_here = you_here->next;
+                delete last->next;
+                last->next = you_here;
             }
             else{
-                task *na_raz = you_here->next->next;
-                you_here->next->next = nullptr;
-                delete you_here->next;
-                you_here->next = na_raz;
+                last = you_here;
+                you_here = you_here->next;
+                begin = you_here;
+                delete last;
+                last = nullptr;
             }
-            change_all_next_num = true;
+            continue;
         }
+        last = you_here;
         you_here = you_here->next;
-        if (you_here->next == nullptr){
-            you_here->task_num--;
-        }
     }
 
     return begin;
