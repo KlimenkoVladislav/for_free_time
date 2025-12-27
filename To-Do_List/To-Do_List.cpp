@@ -62,12 +62,12 @@ int main(){
         do{
             std::cout << "Введите номер действия: ";
             std::cin >> num;
-        }while (num<0 or num>5);
+        }while (num<0 or num>6);
 
         if (num == 0){
             while (begin){
                 task *mem_del = begin->next;
-                delete[] begin;
+                delete begin;
                 begin = mem_del;
             }
             break;
@@ -93,7 +93,7 @@ int main(){
                 kol_task--;
                 begin = delete_task(begin, kol_task);
                 last = begin;
-                if (last!=nullptr){
+                if (last){
                     while (last->next){
                         last = last->next;
                     }
