@@ -1,10 +1,48 @@
 #include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+
+#define RED   "\033[31m"
+#define GREEN "\033[32m"
+#define RESET "\033[0m"
 
 void kramer();
 float determinat(int N, int **matrica, int flag);
+void sum_matrix();
+std::vector<std::vector<float>> add_new_matrix(int &kol_elem_in_row);
+std::vector<float> add_str_in_matrix(std::string stroka_for_add_in_matrix, int &kol_elem_in_row);
 
 int main(){
-    kramer();
+    while (true){
+        int napravlenie;
+        std::cout << "\n1 - Работа с матрицами\n"
+                  << "0 - Выход\n";
+        do{
+            std::cout << "Введите выбранное направление: ";
+            std::cin >> napravlenie;
+        }while (napravlenie < 0 or napravlenie > 1);
+
+        if (napravlenie == 0){
+            return 0;
+        }
+        else if (napravlenie == 1){
+            while (true){
+                int zadacha;
+                std::cout << "\n1 - Посчитать определитель\n"
+                          << "2 - Сложить матрицы\n"
+                          << "0 - Вернуться обратно\n";
+                do{
+                    std::cout << "Выберите задачу: ";
+                    std::cin >> zadacha;
+                }while(zadacha < 0 or zadacha > 2);
+
+                if (zadacha == 0){break;}
+                else if (zadacha == 1){kramer();}
+                else if (zadacha == 2){sum_matrix();}
+            }
+        }
+    }
 }
 
 void kramer(){
@@ -103,4 +141,81 @@ float determinat(int N, int **matrica, int flag){
     delete[] d_matrica[0];
     delete[] d_matrica;
     return det;
+}
+
+void sum_matrix(){
+    int kol_matric;
+    do{
+        std::cout << "Введите количество матриц, которые хотите сложить: ";
+        std::cin >> kol_matric;
+    }while(kol_matric < 2);
+    std::cin.ignore();
+
+    std::vector<std::vector<std::vector<float>>> massiv_matric;
+    int kol_elem_in_row = 0;
+    for (int i = 0; i<kol_matric; i++){
+        massiv_matric.push_back(add_new_matrix(kol_elem_in_row));
+
+        for (const auto &row: massiv_matric[i]){
+            for(float val: row){
+                std::cout << val << " ";
+            }
+            std::cout << std::endl;
+        }
+    }
+
+    std::cout << GREEN << "ОТВЕТ" << RESET << std::endl;
+    for (int i = 0; i<kol_elem_in_row; i++){
+        for (int j = 0; j<kol_elem_in_row; j++){
+            std::cout << massiv_matric[0][i][j] + massiv_matric[1][i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    massiv_matric.clear();
+}
+
+std::vector<std::vector<float>> add_new_matrix(int &kol_elem_in_row){
+    std::vector<std::vector<float>> new_matrix;
+    int row = 0;
+    
+    do{
+        std::string str_row;
+        while (true){
+            std::cout << "Введите строку матрицы: ";
+            std::getline(std::cin, str_row);
+            new_matrix.push_back(add_str_in_matrix(str_row, kol_elem_in_row));
+            if (new_matrix.back().size() != 0){
+                break;
+            }
+            else{
+                new_matrix.pop_back();
+            }
+        }
+        if (row == 0){
+            new_matrix.reserve(kol_elem_in_row*(kol_elem_in_row-1));
+        }
+        row++;
+    }while(row < kol_elem_in_row);
+
+    return new_matrix;
+}
+
+std::vector<float> add_str_in_matrix(std::string stroka_for_add_in_matrix, int &kol_elem_in_row_global){
+    std::vector<float> str_for_matrix;
+    float elem = 0.0;
+    std::stringstream ss(stroka_for_add_in_matrix);
+    int kol_elem_in_row_local = 0;
+    while (ss >> elem){
+        kol_elem_in_row_local++;
+        str_for_matrix.push_back(elem);
+    }
+    if (kol_elem_in_row_global == 0){
+        kol_elem_in_row_global = kol_elem_in_row_local;
+    }
+    else if (kol_elem_in_row_global != kol_elem_in_row_local){
+        std::cout << RED << "error " << RESET;
+        str_for_matrix.clear();
+    }
+    return str_for_matrix;
 }
