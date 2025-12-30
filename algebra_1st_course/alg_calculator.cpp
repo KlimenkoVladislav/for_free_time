@@ -7,10 +7,12 @@
 #define GREEN "\033[32m"
 #define RESET "\033[0m"
 
+typedef std::vector<std::vector<float>> v_v_float;
+
 void kramer();
-float determinat(int N, int **matrica, int flag);
+float determinat(int N, v_v_float matrica, int flag);
 void sum_matrix();
-std::vector<std::vector<float>> add_new_matrix(int &kol_elem_in_row);
+v_v_float add_new_matrix(int &kol_elem_in_row, int plus_elem_in_row);
 std::vector<float> add_str_in_matrix(std::string stroka_for_add_in_matrix, int &kol_elem_in_row);
 
 int main(){
@@ -29,8 +31,8 @@ int main(){
         else if (napravlenie == 1){
             while (true){
                 int zadacha;
-                std::cout << "\n1 - Посчитать определитель\n"
-                          << "2 - Сложить матрицы\n"
+                std::cout << "\n1 - Сложить матрицы\n"
+                          << "2 - Найти неизвестные (x)\n"
                           << "0 - Вернуться обратно\n";
                 do{
                     std::cout << "Выберите задачу: ";
@@ -38,53 +40,54 @@ int main(){
                 }while(zadacha < 0 or zadacha > 2);
 
                 if (zadacha == 0){break;}
-                else if (zadacha == 1){kramer();}
-                else if (zadacha == 2){sum_matrix();}
+                else if (zadacha == 1){sum_matrix();}
+                else if (zadacha == 2){kramer();}
             }
         }
     }
 }
 
 void kramer(){
-    int n; 
+    int kol_row; 
     do{
         std::cout << "Введите размер матрицы NxN: ";
-        std::cin >> n;
-    }while(n<2);
+        std::cin >> kol_row;
+    }while(kol_row<2);
+    std::cin.ignore();
 
-    int **matrica = new int*[n];
-    matrica[0] = new int[n*(n+1)];
-    for (int i = 0; i<n; i++){
-        matrica[i] = matrica[0] + i*(n+1);
-        for (int j = 0; j<n+1; j++){
-            int k; 
-            if (j!=n){std::cout << "Введите значение x" << j+1 << ": ";}
-            else {std::cout << "Введите значение, которому будет равна ваша строка: ";}
-            std::cin >> k;
-            matrica[i][j] = k;
-        }
-        std::cout << "__________________________________________________________\n";
-    }
+    int kol_elem_in_row = kol_row+1;
+    v_v_float matrica = add_new_matrix(kol_elem_in_row, kol_elem_in_row-kol_row);
+    // std::string str_row;
+    // for (int i = 0; i<kol_row;){
+    //     std::cout << "Введите строку расширенной матрицы:";
+    //     std::getline(std::cin, str_row);
+    //     matrica.push_back(add_str_in_matrix(str_row, kol_elem_in_row));
+    //     if (matrica.back().size() == 0){
+    //         matrica.pop_back();
+    //         continue;
+    //     }
+    //     i++;
+    // }
 
     std::cout << "Система уравнений:\n";
-    for (int i = 0; i<n; i++){
-        for (int j = 0; j<n+1; j++){
-            if (j < n-1){
+    for (int i = 0; i<kol_row; i++){
+        for (int j = 0; j<kol_elem_in_row; j++){
+            if (j < kol_row-1){
                 std::cout << "(" << matrica[i][j] << ")*" << "x" << j+1 << " + ";
             }
-            else if (j == n-1){
+            else if (j == kol_row-1){
                 std::cout << "(" << matrica[i][j] << ")*" << "x" << j+1 << " ";
             }
-            else if (j == n){
+            else if (j == kol_row){
                 std::cout << "= " << matrica[i][j] << "\n";
             }
         }
     }
 
     std::cout << "\nРасширенная матрица:\n";
-    for (int i = 0; i<n; i++){
-        for (int j = 0; j<n+1; j++){
-            if (j != n){
+    for (int i = 0; i<kol_row; i++){
+        for (int j = 0; j<kol_elem_in_row; j++){
+            if (j != kol_row){
                 std::cout << matrica[i][j] << " ";
             }
             else{
@@ -94,52 +97,40 @@ void kramer(){
     }
     std::cout << "\n";
 
-    int main_det = determinat(n, matrica, -1);
+    int main_det = determinat(kol_row, matrica, -1);
+    std::cout << GREEN << "\nОТВЕТ" << RESET << std::endl;
     if (main_det!=0){
-        for (int i=0; i<n; i++){
-            std::cout << "x" << i+1 << " = " << determinat(n, matrica, i)/main_det << "\n"; 
+        for (int i=0; i<kol_row; i++){
+            std::cout << "x" << i+1 << " = " << determinat(kol_row, matrica, i)/main_det << "\n"; 
         }
     }
     else{std::cout << "Нет единственного решения\n";}
-
-    delete[] matrica[0];
-    delete[] matrica;
 }
 
-float determinat(int N, int **matrica, int flag){
+float determinat(int N, v_v_float matrica, int flag){
     float det = 0;
-    int **d_matrica = new int*[N];
-    d_matrica[0] = new int[N*(N+1)];
-    for (int i=0; i<N; i++){
-        d_matrica[i] = d_matrica[0] + i*(N+1);
-        for (int j=0; j<N+1; j++){
-            d_matrica[i][j] = matrica[i][j];
+
+    if (flag >= 0){
+        for (int i = 0; i<N; i++){
+            matrica[i][flag] = matrica[i][N];
         }
-        if (flag>=0){d_matrica[i][flag] = matrica[i][N];}
     }
 
     if (N>2){
         for (int x=0; x<N; x++){
-            int **smaller_matrica = new int*[N-1];
-            smaller_matrica[0] = new int[N];
+            v_v_float smaller_matrica(N-1, std::vector<float>(N, 0));
             for (int i=0; i<N-1; i++){
-                smaller_matrica[i] = smaller_matrica[0] + i*N;
                 for (int j=0; j<N; j++){
-                    if (j<x){smaller_matrica[i][j] = d_matrica[i][j];}
-                    else if (j>=x){smaller_matrica[i][j] = d_matrica[i][j+1];}
+                    if (j<x){smaller_matrica[i][j] = matrica[i][j];}
+                    else if (j>=x){smaller_matrica[i][j] = matrica[i][j+1];}
                 }
             }
             int znak = (x % 2 == 0)? 1 : -1;
-            det+=znak*d_matrica[N-1][x]*determinat(N-1, smaller_matrica, -1);
-
-            delete[] smaller_matrica[0];
-            delete[] smaller_matrica;
+            det+=znak*matrica[N-1][x]*determinat(N-1, smaller_matrica, -1);
         }
     }
-    else if (N==2){det=d_matrica[0][0]*d_matrica[1][1]-d_matrica[0][1]*d_matrica[1][0];}
+    else if (N==2){det=matrica[0][0]*matrica[1][1]-matrica[0][1]*matrica[1][0];}
 
-    delete[] d_matrica[0];
-    delete[] d_matrica;
     return det;
 }
 
@@ -151,10 +142,10 @@ void sum_matrix(){
     }while(kol_matric < 2);
     std::cin.ignore();
 
-    std::vector<std::vector<std::vector<float>>> massiv_matric;
+    std::vector<v_v_float> massiv_matric;
     int kol_elem_in_row = 0;
     for (int i = 0; i<kol_matric; i++){
-        massiv_matric.push_back(add_new_matrix(kol_elem_in_row));
+        massiv_matric.push_back(add_new_matrix(kol_elem_in_row, 0));
 
         for (const auto &row: massiv_matric[i]){
             for(float val: row){
@@ -164,10 +155,15 @@ void sum_matrix(){
         }
     }
 
-    std::cout << GREEN << "ОТВЕТ" << RESET << std::endl;
+    std::cout << GREEN << "\nОТВЕТ" << RESET << std::endl;
+    int sum = 0;
     for (int i = 0; i<kol_elem_in_row; i++){
         for (int j = 0; j<kol_elem_in_row; j++){
-            std::cout << massiv_matric[0][i][j] + massiv_matric[1][i][j] << " ";
+            for (int z = 0; z<kol_matric; z++){
+                sum += massiv_matric[z][i][j];
+            }
+            std::cout << sum << " ";
+            sum = 0;
         }
         std::cout << std::endl;
     }
@@ -175,8 +171,9 @@ void sum_matrix(){
     massiv_matric.clear();
 }
 
-std::vector<std::vector<float>> add_new_matrix(int &kol_elem_in_row){
-    std::vector<std::vector<float>> new_matrix;
+v_v_float add_new_matrix(int &kol_elem_in_row, int plus_elem_in_row){
+    v_v_float new_matrix;
+    int kol_row = kol_elem_in_row - plus_elem_in_row;
     int row = 0;
     
     do{
@@ -192,11 +189,14 @@ std::vector<std::vector<float>> add_new_matrix(int &kol_elem_in_row){
                 new_matrix.pop_back();
             }
         }
+        if (kol_row == 0){
+            kol_row = kol_elem_in_row - plus_elem_in_row;
+        }
         if (row == 0){
-            new_matrix.reserve(kol_elem_in_row*(kol_elem_in_row-1));
+            new_matrix.reserve(kol_elem_in_row*(kol_row-1));
         }
         row++;
-    }while(row < kol_elem_in_row);
+    }while(row < kol_row);
 
     return new_matrix;
 }
