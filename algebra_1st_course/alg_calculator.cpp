@@ -14,6 +14,7 @@ float determinat(int N, v_v_float matrica, int flag);
 void sum_matrix();
 v_v_float add_new_matrix(int &kol_elem_in_row, int plus_elem_in_row);
 std::vector<float> add_str_in_matrix(std::string stroka_for_add_in_matrix, int &kol_elem_in_row);
+void det_find();
 
 int main(){
     while (true){
@@ -32,16 +33,18 @@ int main(){
             while (true){
                 int zadacha;
                 std::cout << "\n1 - Сложить матрицы\n"
-                          << "2 - Найти неизвестные (x)\n"
+                          << "2 - Найти определитель матрицы\n"
+                          << "3 - Найти неизвестные (x)\n"
                           << "0 - Вернуться обратно\n";
                 do{
                     std::cout << "Выберите задачу: ";
                     std::cin >> zadacha;
-                }while(zadacha < 0 or zadacha > 2);
+                }while(zadacha < 0 or zadacha > 3);
 
                 if (zadacha == 0){break;}
                 else if (zadacha == 1){sum_matrix();}
-                else if (zadacha == 2){kramer();}
+                else if (zadacha == 2){det_find();}
+                else if (zadacha == 3){kramer();}
             }
         }
     }
@@ -57,17 +60,6 @@ void kramer(){
 
     int kol_elem_in_row = kol_row+1;
     v_v_float matrica = add_new_matrix(kol_elem_in_row, kol_elem_in_row-kol_row);
-    // std::string str_row;
-    // for (int i = 0; i<kol_row;){
-    //     std::cout << "Введите строку расширенной матрицы:";
-    //     std::getline(std::cin, str_row);
-    //     matrica.push_back(add_str_in_matrix(str_row, kol_elem_in_row));
-    //     if (matrica.back().size() == 0){
-    //         matrica.pop_back();
-    //         continue;
-    //     }
-    //     i++;
-    // }
 
     std::cout << "Система уравнений:\n";
     for (int i = 0; i<kol_row; i++){
@@ -218,4 +210,16 @@ std::vector<float> add_str_in_matrix(std::string stroka_for_add_in_matrix, int &
         str_for_matrix.clear();
     }
     return str_for_matrix;
+}
+
+void det_find(){
+    std::cin.ignore();
+    int kol_elem_in_row = 0;
+    v_v_float matrica = add_new_matrix(kol_elem_in_row, 0);
+    for (auto &row : matrica){
+        row.push_back(0);
+    }
+    float det = determinat(kol_elem_in_row, matrica, -1);
+    std::cout << GREEN << "\nОТВЕТ" << RESET << std::endl;
+    std::cout << det << std::endl;
 }
