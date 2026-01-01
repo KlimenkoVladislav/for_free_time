@@ -16,6 +16,7 @@ v_v_float add_new_matrix(int &kol_elem_in_row, int plus_elem_in_row, int kol_row
 std::vector<float> add_str_in_matrix(std::string stroka_for_add_in_matrix, int &kol_elem_in_row);
 void det_find();
 void multiply_matrix();
+void transpose();
 
 int main(){
     while (true){
@@ -35,19 +36,21 @@ int main(){
                 int zadacha;
                 std::cout << "\n1 - Сложить матрицы\n"
                           << "2 - Умножить матрицы\n"
-                          << "3 - Найти определитель матрицы\n"
-                          << "4 - Найти неизвестные (x)\n"
+                          << "3 - Транспонировать матрицу\n"
+                          << "4 - Найти определитель матрицы\n"
+                          << "5 - Найти неизвестные (x)\n"
                           << "0 - Вернуться обратно\n";
                 do{
                     std::cout << "Выберите задачу: ";
                     std::cin >> zadacha;
-                }while(zadacha < 0 or zadacha > 4);
+                }while(zadacha < 0 or zadacha > 5);
 
                 if (zadacha == 0){break;}
                 else if (zadacha == 1){sum_matrix();}
                 else if (zadacha == 2){multiply_matrix();}
-                else if (zadacha == 3){det_find();}
-                else if (zadacha == 4){kramer();}
+                else if (zadacha == 3){transpose();}
+                else if (zadacha == 4){det_find();}
+                else if (zadacha == 5){kramer();}
             }
         }
     }
@@ -247,6 +250,25 @@ void multiply_matrix(){
                 z++;
             }
             std::cout << mult << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+void transpose(){
+    v_v_float matrica;
+    int kol_elem_in_row = 0;
+    int kol_row;
+    do{
+        std::cout << "Введите количекство строк матрицы: ";
+        std::cin >> kol_row;
+    }while(kol_row <= 0);
+    std::cin.ignore();
+
+    matrica = add_new_matrix(kol_elem_in_row, 0, kol_row);
+    for (int i = 0; i<kol_elem_in_row; i++){
+        for (const auto &row : matrica){
+            std::cout << row[i] << " ";
         }
         std::cout << std::endl;
     }
