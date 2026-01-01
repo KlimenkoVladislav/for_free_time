@@ -12,9 +12,10 @@ typedef std::vector<std::vector<float>> v_v_float;
 void kramer();
 float determinat(int N, v_v_float matrica, int flag);
 void sum_matrix();
-v_v_float add_new_matrix(int &kol_elem_in_row, int plus_elem_in_row);
+v_v_float add_new_matrix(int &kol_elem_in_row, int plus_elem_in_row, int kol_row = -1);
 std::vector<float> add_str_in_matrix(std::string stroka_for_add_in_matrix, int &kol_elem_in_row);
 void det_find();
+void multiply_matrix();
 
 int main(){
     while (true){
@@ -33,18 +34,20 @@ int main(){
             while (true){
                 int zadacha;
                 std::cout << "\n1 - Сложить матрицы\n"
-                          << "2 - Найти определитель матрицы\n"
-                          << "3 - Найти неизвестные (x)\n"
+                          << "2 - Умножить матрицы\n"
+                          << "3 - Найти определитель матрицы\n"
+                          << "4 - Найти неизвестные (x)\n"
                           << "0 - Вернуться обратно\n";
                 do{
                     std::cout << "Выберите задачу: ";
                     std::cin >> zadacha;
-                }while(zadacha < 0 or zadacha > 3);
+                }while(zadacha < 0 or zadacha > 4);
 
                 if (zadacha == 0){break;}
                 else if (zadacha == 1){sum_matrix();}
-                else if (zadacha == 2){det_find();}
-                else if (zadacha == 3){kramer();}
+                else if (zadacha == 2){multiply_matrix();}
+                else if (zadacha == 3){det_find();}
+                else if (zadacha == 4){kramer();}
             }
         }
     }
@@ -138,13 +141,6 @@ void sum_matrix(){
     int kol_elem_in_row = 0;
     for (int i = 0; i<kol_matric; i++){
         massiv_matric.push_back(add_new_matrix(kol_elem_in_row, 0));
-
-        for (const auto &row: massiv_matric[i]){
-            for(float val: row){
-                std::cout << val << " ";
-            }
-            std::cout << std::endl;
-        }
     }
 
     std::cout << GREEN << "\nОТВЕТ" << RESET << std::endl;
@@ -163,9 +159,11 @@ void sum_matrix(){
     massiv_matric.clear();
 }
 
-v_v_float add_new_matrix(int &kol_elem_in_row, int plus_elem_in_row){
+v_v_float add_new_matrix(int &kol_elem_in_row, int plus_elem_in_row, int kol_row){
     v_v_float new_matrix;
-    int kol_row = kol_elem_in_row - plus_elem_in_row;
+    if (kol_row == -1){
+        kol_row = kol_elem_in_row - plus_elem_in_row;
+    }
     int row = 0;
     
     do{
@@ -181,7 +179,7 @@ v_v_float add_new_matrix(int &kol_elem_in_row, int plus_elem_in_row){
                 new_matrix.pop_back();
             }
         }
-        if (kol_row == 0){
+        if (kol_row <= 0){
             kol_row = kol_elem_in_row - plus_elem_in_row;
         }
         if (row == 0){
@@ -222,4 +220,34 @@ void det_find(){
     float det = determinat(kol_elem_in_row, matrica, -1);
     std::cout << GREEN << "\nОТВЕТ" << RESET << std::endl;
     std::cout << det << std::endl;
+}
+
+void multiply_matrix(){
+    v_v_float matrica_1, matrica_2;
+    int kol_elem_in_row_1 = 0;
+    int kol_elem_in_row_2 = 0;
+    int kol_row;
+    do{
+        std::cout << "Введите количество строк в первой матрице: ";
+        std::cin >> kol_row;
+    }while(kol_row <= 0);
+    std::cin.ignore();
+    
+    matrica_1 = add_new_matrix(kol_elem_in_row_1, 0, kol_row);
+    std::cout << "\nВторая матрица: \n";
+    matrica_2 = add_new_matrix(kol_elem_in_row_2, 0, kol_elem_in_row_1);
+
+    std::cout << GREEN << "\nОТВЕТ" << RESET << std::endl;
+    for (int i = 0; i<kol_row; i++){
+        for (int j = 0; j<kol_elem_in_row_2; j++){
+            float mult = 0.0;
+            int z = 0;
+            for (const auto &row : matrica_2){
+                mult += matrica_1[i][z] * row[j];
+                z++;
+            }
+            std::cout << mult << " ";
+        }
+        std::cout << std::endl;
+    }
 }
