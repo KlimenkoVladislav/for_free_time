@@ -1,0 +1,23 @@
+# Условия задач
+## 1
+![alt text](img/image.png)
+![alt text](img/image-1.png)
+## 2
+![alt text](img/image-2.png)
+![alt text](img/image-3.png)
+## 3
+![alt text](img/image-4.png)
+![alt text](img/image-5.png)
+![alt text](img/image-6.png)
+## 4
+![alt text](img/image-7.png)
+![alt text](img/image-8.png)
+## 5
+![alt text](img/image-9.png)
+![alt text](img/image-10.png)
+## 6
+![alt text](img/image-11.png)
+![alt text](img/image-12.png)
+## 7
+![alt text](img/image-13.png)
+![alt text](img/image-14.png)
