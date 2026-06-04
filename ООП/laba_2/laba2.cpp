@@ -107,8 +107,18 @@ public:
     }
 
     void getArea() const {
-        //надо сначала запрогать матрицу поворота и интегралы
+    // Формула площади Гаусса для четырёхугольника
+    // S = 1/2 * |(x1*y2 + x2*y3 + x3*y4 + x4*y1) - (y1*x2 + y2*x3 + y3*x4 + y4*x1)|
+    float sum1 = 0, sum2 = 0;
+    for (int i = 0; i < 4; i++){
+        int j = (i + 1) % 4;
+        sum1 += quadrilateral[i][0] * quadrilateral[j][1];
+        sum2 += quadrilateral[i][1] * quadrilateral[j][0];
     }
+    
+    float area = 0.5f * std::abs(sum1 - sum2);
+    std::cout << "Площадь = " << area << std::endl;
+}
 
     virtual void getInfo() const {
         std::cout << "\nКоординаты углов четырёхугольника:\n";
